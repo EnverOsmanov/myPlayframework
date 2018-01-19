@@ -1,7 +1,7 @@
 package yalp.runsupport
 
 import java.io.{Closeable, File}
-import java.net.URL
+import java.net.{URL, URLClassLoader}
 import java.security.{AccessController, PrivilegedAction}
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -127,9 +127,63 @@ object Reloader {
 
         if (httpPort.isDefined) {
 
+          println(s"RELOADER: ${buildLoader}")
+          println()
+          println(s"MAP RELOADER_DepCL_u: ${applicationLoader.getURLs.toList}")
+          println()
+          Option(applicationLoader.getParent)
+            .flatMap{
+              case parent: URLClassLoader =>
+                println(s"MAP RELOADER_DepCL_parent: $parent")
+                println(s"MAP RELOADER_DepCL_parent_u: ${parent.getURLs.toList}")
+                Option(parent.getParent)
+
+              case parent =>
+                println(s"MAP RELOADER_DepCL_parent: $parent")
+                Option(parent.getParent)
+            }
+            //.flatMap{ case parent: URLClassLoader => println(s"MAP RELOADER_SET_parent_2: $parent"); Option(parent.getParent) }
+            .flatMap{ parent => println(s"MAP RELOADER_DepCL_parent_3: $parent"); Option(parent.getParent) }
+            .flatMap{ parent => println(s"MAP RELOADER_DepCL_parent_4: $parent"); Option(parent.getParent) }
+            .flatMap{ parent => println(s"MAP RELOADER_DepCL_parent_5: $parent"); Option(parent.getParent) }
+
+          println()
+
           println(s"MAP RELOADER_OBJ: ${getClass.getClassLoader}")
           println(s"MAP RELOADER_INS: ${reloader.getClass.getClassLoader}")
+
+          Option(reloader.getClass.getClassLoader.getParent)
+            .flatMap{ case parent: URLClassLoader =>
+              println(s"MAP RELOADER_INS_parent: $parent")
+              println(s"MAP RELOADER_INS_parent_u: ${parent.getURLs.toList}")
+              Option(parent.getParent)
+            }
+            .flatMap{ case parent: URLClassLoader =>
+              println(s"MAP RELOADER_SET_parent_2: $parent")
+              println(s"MAP RELOADER_SET_parent_2_u: ${parent.getURLs.toList}")
+              Option(parent.getParent)
+            case _ => None
+            }
+            .flatMap{ case parent: URLClassLoader =>
+              println(s"MAP RELOADER_INS_parent_3: $parent")
+              println(s"MAP RELOADER_INS_parent_3_u: ${parent.getURLs.toList}")
+              Option(parent)
+            case _ => None
+            }
+
           println(s"MAP RELOADER_SET: ${reloader.settings.getClass.getClassLoader}")
+          println(s"MAP RELOADER_SET_u: ${reloader.settings.getClass.getClassLoader.asInstanceOf[URLClassLoader].getURLs.toList}")
+          Option(reloader.settings.getClass.getClassLoader.getParent)
+            .flatMap{ case parent: URLClassLoader =>
+              println(s"MAP RELOADER_SET_parent: $parent")
+              println(s"MAP RELOADER_SET_parent_u: ${parent.getURLs.toList}")
+              Option(parent.getParent)
+            }
+            //.flatMap{ case parent: URLClassLoader => println(s"MAP RELOADER_SET_parent_2: $parent"); Option(parent.getParent) }
+            .flatMap{ parent => println(s"MAP RELOADER_SET_parent_3: $parent"); Option(parent.getParent) }
+            .flatMap{ parent => println(s"MAP RELOADER_SET_parent_4: $parent"); Option(parent.getParent) }
+            .flatMap{ parent => println(s"MAP RELOADER_SET_parent_5: $parent"); Option(parent.getParent) }
+
           val mainDev = mainClass.getMethod("mainDevHttpMode", classOf[BuildLink], classOf[Int], classOf[String])
           mainDev.invoke(null, reloader, httpPort.get: java.lang.Integer, httpAddress).asInstanceOf[ReloadableServer]
         }

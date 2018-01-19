@@ -16,8 +16,16 @@ class DelegatingClassLoader(private val commonLoader: ClassLoader,
 
   @throws(classOf[ClassNotFoundException])
   override def loadClass(name: String, resolve: Boolean): Class[_] = {
-    if (sharedClasses.contains(name)) buildLoader.loadClass(name)
-    else super.loadClass(name, resolve)
+    /*if (sharedClasses.contains(name)) {
+      println(s"DelCP: buildLoader ($name, $resolve)")
+      buildLoader.loadClass(name)
+    }
+    else {
+      println(s"DelCP: super.loadClass ($name, $resolve)")
+      super.loadClass(name, resolve)
+    }*/
+
+    buildLoader.loadClass(name)
   }
 
   @throws(classOf[IOException])

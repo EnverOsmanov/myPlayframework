@@ -2,8 +2,8 @@ package yalp.sbt
 
 import play.dev.filewatch.FileWatchService
 import sbt.Keys._
-import sbt.stringToOrganization
-import sbt.{Provided, Classpaths, Compile, Keys, Runtime, Setting}
+import sbt.{Classpaths, Compile, Def, Defaults, Keys, Provided, Runtime, Setting, inConfig, stringToOrganization}
+import com.typesafe.sbt.packager.universal.UniversalPlugin.autoImport.Universal
 import yalp.core.PlayVersion
 import yalp.sbt.PlayImport.PlayKeys._
 import yalp.sbt.PlayInternalKeys.{playCommonClassloader, playCompileEverything, playDependencyClasspath, playReloaderClasspath}
@@ -51,8 +51,27 @@ object PlaySettings extends PlaySettingsCompat {
     //mainClass in Compile := Some("yalp.core.server.ProdServerStart"),
 
 /*    mappings in Universal ++= {
+      val resourceMappings = (playExternalizedResources in Compile).value
 
-    }*/
-  )
+      if (externalizeResources.value) {
+        resourceMappings.map {
+          case (resource, path) => resource -> s"conf/$path"
+        }
+      }
+      else Nil
+    },
+
+    mappings in Universal ++= Def.taskDyn {
+      Def.task(Seq.empty[(sbt.File, String)])
+    }.value*/
+  ) ++ inConfig(Compile)(externalizedSettings)
+
+
+  private def externalizedSettings: Seq[Setting[_]] = Seq(
+    playExternalizedResources := getPlayExternalizedResources(
+      unmanagedResourceDirectories.value,
+      unmanagedResources.value
+    )
+  )/* ++ Defaults.packageTaskSettings(playJarSansExternalized, mappings in playJarSansExternalized)*/
 
 }

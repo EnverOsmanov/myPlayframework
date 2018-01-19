@@ -43,6 +43,9 @@ case class Configuration(underlying: Config) {
 
 object Configuration {
 
+  val empty = Configuration(ConfigFactory.empty)
+
+
   private[yalp] def load(
                         classLoader: ClassLoader,
                         properties: Properties,

@@ -1,5 +1,7 @@
 package yalp.api
 
+import java.util.concurrent.atomic.AtomicInteger
+
 import org.slf4j.{LoggerFactory, Marker, Logger => Slf4jLogger}
 
 trait LoggerLike {
@@ -82,6 +84,27 @@ class Logger private(val logger: Slf4jLogger, isEnabled: => Boolean) extends Log
 }
 
 object Logger extends Logger(LoggerFactory.getLogger("application")) {
+
+  private[this] val log: Slf4jLogger = LoggerFactory.getLogger(getClass)
+
+  private[this] var _mode: Option[Mode] = None
+  private[this] var _appsRunning: AtomicInteger = new AtomicInteger(0)
+
+
+  def applicationMode: Option[Mode] = _mode
+
+  def setApplicationMode(mode: Mode): Unit = {
+    val appsRunning = _appsRunning.incrementAndGet()
+
+    applicationMode foreach { currentMode =>
+      if (currentMode != mode) {
+        log.warn(s"Setting logging mode to $mode when it was previously set to $currentMode")
+        log.warn(s"There are currently $appsRunning applications running.")
+      }
+    }
+
+    _mode = Some(mode)
+  }
 
   def apply(clazz: Class[_]): Logger = new Logger(
     LoggerFactory.getLogger(clazz.getName.stripSuffix("$"))

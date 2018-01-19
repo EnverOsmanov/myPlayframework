@@ -39,6 +39,10 @@ object PlayRun extends PlayRunCompat {
                   assetsClassLoader: TaskKey[ClassLoader => ClassLoader]
                  ): Def.Initialize[InputTask[Unit]] = Def.inputTask{
     println("THIS IS PLAY run task")
+    println(s"pDepCPath: ${playDependencyClasspath.value}")
+    println()
+    println(s"externalDepCP ${(externalDependencyClasspath in sbt.Runtime).value}")
+    println()
 
     val args = Def.spaceDelimited().parsed
 

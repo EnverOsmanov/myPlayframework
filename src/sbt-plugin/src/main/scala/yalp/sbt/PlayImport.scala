@@ -16,6 +16,8 @@ object PlayImport {
 
     /** A hook to configure how play blocks on user input while running. */
     val playInteractionMode = SettingKey[PlayInteractionMode]("playInteractionMode", "Hook to configure how Play blocks when running")
+    val playExternalizedResources = TaskKey[Seq[(File, String)]]("playExternalizedResources", "The resources to externalize")
+    val playJarSansExternalized = TaskKey[File]("playJarSansExternalized", "Creates a jar file that has all the externalized resources excluded")
 
     val playPlugin = SettingKey[Boolean]("playPlugin")
 

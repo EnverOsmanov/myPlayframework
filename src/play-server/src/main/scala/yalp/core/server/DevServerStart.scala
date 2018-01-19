@@ -27,7 +27,13 @@ object DevServerStart {
               httpAddress: String): ReloadableServer = {
     val classLoader = getClass.getClassLoader
 
-    println(s"MAP BUILDLINK: ${classLoader}")
+    System.out.println("\n---- The where is Scala? test ----\n")
+    System.out.println(this.getClass.getClassLoader.getResource("scala/Predef$.class"))
+    println(s"MAP BUILDLINK_dev: ${classLoader} \n")
+    println(s"MAP[S, S] BUILDLINK_real: ${classOf[Map[String, String]].getClassLoader} \n")
+    println(s"MAP_real by DepCL: ${classLoader.loadClass("scala.collection.immutable.Map").getClassLoader} \n")
+    println(s"MAP_real by PlugM-PCL: ${buildLink.getClass.getClassLoader.loadClass("scala.collection.immutable.Map").getClassLoader} \n")
+    println(s"MAP BUILDLINK_set: ${buildLink.settings.getClass.getClassLoader} \n")
     Threads.withContextClassLoader(classLoader) {
       try {
         val process = new RealServerProcess(Nil)
@@ -50,6 +56,7 @@ object DevServerStart {
         try new File(path, "logs/application.log").delete()
         catch { case NonFatal(_) => }
 
+        println(s"LOGGER start!!!")
         LoggerConfigurator(this.getClass.getClassLoader) match {
           case Some(loggerConfigurator) =>
             loggerConfigurator.init(path, Mode.Dev)
